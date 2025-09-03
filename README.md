@@ -634,46 +634,8 @@ DB_CONNECTION=mysql
 DB_HOST=seu-host-de-producao
 DB_DATABASE=paytour_jobs_prod
 
-# Cache e Sessões
-CACHE_DRIVER=redis
-SESSION_DRIVER=redis
-QUEUE_CONNECTION=redis
-
 # Storage
 FILESYSTEM_DISK=local
-
-# Email
-MAIL_MAILER=smtp
-MAIL_HOST=smtp.mailgun.org
-MAIL_PORT=587
-```
-
-#### 3. Configuração do Servidor Web
-
-**Nginx**:
-```nginx
-server {
-    listen 80;
-    server_name paytour-jobs.com;
-    root /var/www/paytour-jobs/public;
-    
-    index index.php;
-    
-    location / {
-        try_files $uri $uri/ /index.php?$query_string;
-    }
-    
-    location ~ \.php$ {
-        fastcgi_pass unix:/var/run/php/php8.2-fpm.sock;
-        fastcgi_index index.php;
-        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
-        include fastcgi_params;
-    }
-    
-    # Security headers
-    add_header X-Frame-Options "SAMEORIGIN";
-    add_header X-Content-Type-Options "nosniff";
-}
 ```
 
 ---
