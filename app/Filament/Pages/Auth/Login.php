@@ -6,9 +6,20 @@ use Filament\Forms\Components\TextInput;
 use Filament\Auth\Pages\Login as BaseLogin;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Schema;
+use Illuminate\Contracts\Support\Htmlable;
 
 class Login extends BaseLogin
 {
+    public function getHeading(): string | Htmlable
+    {
+        return 'Acesso Administrativo';
+    }
+
+    public function getSubheading(): string | Htmlable | null
+    {
+        return 'Entre com suas credenciais para acessar o painel administrativo';
+    }
+
     public function form(Schema $schema): Schema
     {
         return $schema
@@ -41,5 +52,12 @@ class Login extends BaseLogin
             ->required()
             ->default('password')
             ->extraInputAttributes(['tabindex' => 2]);
+    }
+
+    protected function getFormActions(): array
+    {
+        return [
+            $this->getAuthenticateFormAction(),
+        ];
     }
 }

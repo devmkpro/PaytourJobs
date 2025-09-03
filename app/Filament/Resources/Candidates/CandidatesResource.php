@@ -14,6 +14,7 @@ use Filament\Actions\EditAction;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\ExportAction;
+use Filament\Actions\ViewAction;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
@@ -187,8 +188,7 @@ class CandidatesResource extends Resource
             ])
             ->recordActions([
                 ActionGroup::make([
-                    EditAction::make(),
-
+                    ViewAction::make(),
                     Action::make('download_resume')
                         ->label(__('Download Resume'))
                         ->icon('heroicon-o-arrow-down-tray')
@@ -204,6 +204,7 @@ class CandidatesResource extends Resource
                                 !empty($record->resume_path) &&
                                 Storage::disk('public')->exists($record->resume_path)
                         ),
+                    EditAction::make(),
                     DeleteAction::make(),
                 ])
 
