@@ -22,7 +22,6 @@ Um sistema completo de gestão de candidaturas desenvolvido com **Laravel 12** e
 - [🔐 Estrutura de Permissões](#-estrutura-de-permissões)
 - [🌐 Rotas e Endpoints](#-rotas-e-endpoints)
 - [🧪 Testes](#-testes)
-- [🚀 Deploy](#-deploy)
 - [🤝 Avaliação Técnica](#-avaliação-técnica)
 
 ---
@@ -602,41 +601,6 @@ php artisan test
 - **Refatoração Segura** - Permite mudanças com confiança
 - **CI/CD Ready** - Integração contínua preparada
 - **Qualidade de Código** - Força boas práticas de desenvolvimento
-
----
-
-## 🚀 Deploy
-
-### 🏭 Configuração de Produção
-
-#### 1. Otimizações
-```bash
-# Cache de configuração
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-
-# Otimização do autoloader
-composer install --optimize-autoloader --no-dev
-
-# Build de produção
-npm run build
-```
-
-#### 2. Variáveis de Ambiente
-```env
-APP_ENV=production
-APP_DEBUG=false
-APP_URL=https://paytour-jobs.com
-
-# Banco de dados
-DB_CONNECTION=mysql
-DB_HOST=seu-host-de-producao
-DB_DATABASE=paytour_jobs_prod
-
-# Storage
-FILESYSTEM_DISK=local
-```
 
 ---
 
