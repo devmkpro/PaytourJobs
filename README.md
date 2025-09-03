@@ -653,12 +653,8 @@ CACHE_DRIVER=redis
 SESSION_DRIVER=redis
 QUEUE_CONNECTION=redis
 
-# Storage (AWS S3)
-FILESYSTEM_DISK=s3
-AWS_ACCESS_KEY_ID=sua-access-key
-AWS_SECRET_ACCESS_KEY=sua-secret-key
-AWS_DEFAULT_REGION=us-east-1
-AWS_BUCKET=paytour-jobs-storage
+# Storage
+FILESYSTEM_DISK=local
 
 # Email
 MAIL_MAILER=smtp
