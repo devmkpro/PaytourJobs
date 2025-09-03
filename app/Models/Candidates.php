@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use App\Enums\EducationLevel;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Candidates extends Model
 {
+    use HasFactory;
     protected $table = 'candidates';
     protected $fillable = [
         'name',

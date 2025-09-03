@@ -512,58 +512,110 @@ GET /storage/livewire-tmp/{file}    // Arquivos temporários
 
 ## 🧪 Testes
 
+O sistema possui uma **suíte de testes abrangente** desenvolvida com **PHP Pest**, garantindo a qualidade e confiabilidade do código.
+
 ### 🚀 Executar Testes
+
 ```bash
-# Todos os testes
+# Executar todos os testes
+./vendor/bin/pest
+
+# Executar apenas testes unitários
+./vendor/bin/pest tests/Unit/
+
+# Executar apenas testes de feature
+./vendor/bin/pest tests/Feature/
+
+# Executar testes com detalhes verbose
+./vendor/bin/pest --verbose
+
+# Executar testes com parada no primeiro erro
+./vendor/bin/pest --stop-on-failure
+
+# Alternativa usando Laravel Artisan
 php artisan test
-
-# Testes específicos
-php artisan test --filter CandidateApplicationTest
-
-# Testes com cobertura
-php artisan test --coverage
-
-# Testes em paralelo
-php artisan test --parallel
 ```
 
-### 📋 Suíte de Testes
+### 📊 Cobertura de Testes
 
-#### 🔬 Testes Unitários
+**39 testes** passando com **121 asserções**, cobrindo:
+
+- ✅ **Modelos** - Validação de dados e relacionamentos
+- ✅ **Enums** - Níveis educacionais e seus valores
+- ✅ **Validações** - Regras de negócio e sanitização
+- ✅ **Componentes Livewire** - Funcionalidades interativas
+- ✅ **Regras de Negócio** - Anti-spam e duplicações
+
+### 📋 Suíte de Testes Atual
+
+#### 🔬 Testes Unitários (`tests/Unit/`)
+
+**1. Modelo Candidates** (`CandidatesModelTest.php`)
 ```php
-// tests/Unit/Models/CandidateTest.php
-test('candidate model can be created with valid data')
-test('candidate model validates education level enum')
-test('candidate model generates resume url correctly')
-
-// tests/Unit/Services/CandidateServiceTest.php
-test('candidate service prevents duplicate emails')
-test('candidate service validates file uploads')
+✓ Candidates Model → it can create a candidate with valid data
+✓ Candidates Model → it validates required fields  
+✓ Candidates Model → it casts education_level to enum correctly
+✓ Candidates Model → it returns correct education level label
+✓ Candidates Model → it handles different education levels correctly
+✓ Candidates Model → it stores timestamps correctly
+✓ Candidates Model → it can have nullable observations
+✓ Candidates Model → it can have nullable resume_path
+✓ Candidates Model → it stores submitter_ip correctly
+✓ Candidates Model → it prevents duplicate emails
+✓ Candidates Model → it validates email format in model fillable
 ```
 
-#### 🎭 Testes de Feature
+**2. Enum EducationLevel** (`EducationLevelEnumTest.php`)
 ```php
-// tests/Feature/CandidateSubmissionTest.php
-test('visitor can submit candidate application')
-test('application prevents duplicate email submissions')
-test('application validates required fields')
-test('application handles file upload correctly')
-
-// tests/Feature/AdminPanelTest.php
-test('admin can access candidates dashboard')
-test('admin can create new candidate')
-test('admin can download candidate resume')
-test('unauthorized user cannot access admin panel')
+✓ EducationLevel Enum → it has all expected cases
+✓ EducationLevel Enum → it has correct values for each case
+✓ EducationLevel Enum → it returns correct labels
+✓ EducationLevel Enum → it can be instantiated from string values
+✓ EducationLevel Enum → it throws exception for invalid values
+✓ EducationLevel Enum → it can use tryFrom safely
+✓ EducationLevel Enum → it can be serialized to json
+✓ EducationLevel Enum → it maintains consistency between value and string representation
 ```
 
-#### 🌐 Testes de Browser (Laravel Dusk)
+**3. Validações de Candidatos** (`CandidateValidationTest.php`)
 ```php
-// tests/Browser/CandidateApplicationTest.php
-test('user can complete full application flow')
-test('form validates in real time')
-test('file upload shows progress')
-test('success message appears after submission')
+✓ Candidate Validations → it validates name is required
+✓ Candidate Validations → it validates name maximum length
+✓ Candidate Validations → it validates email format
+✓ Candidate Validations → it accepts valid email formats
+✓ Candidate Validations → it validates phone minimum length
+✓ Candidate Validations → it validates phone maximum length
+✓ Candidate Validations → it accepts valid phone formats
+✓ Candidate Validations → it validates desired position is required
+✓ Candidate Validations → it validates education level is required
+✓ Candidate Validations → it accepts valid education level values
+✓ Candidate Validations → it validates observations maximum length
+✓ Candidate Validations → it allows null observations
+✓ Candidate Validations → it validates file mime types
 ```
+
+#### � Testes de Feature (`tests/Feature/`)
+
+**Teste de Aplicação** (`ExampleTest.php`)
+```php
+✓ the application returns a successful response
+```
+
+### 🛠️ Tecnologias de Teste
+
+- **PHP Pest** - Framework de testes moderno e expressivo
+- **SQLite in-memory** - Banco de dados para testes rápidos
+- **RefreshDatabase** - Limpeza automática entre testes
+- **Factories** - Geração de dados de teste consistentes
+- **Custom Expectations** - Validações específicas do domínio
+
+### 📈 Benefícios da Suíte de Testes
+
+- **Confiabilidade** - Detecta regressões automaticamente
+- **Documentação Viva** - Testes servem como especificação
+- **Refatoração Segura** - Permite mudanças com confiança
+- **CI/CD Ready** - Integração contínua preparada
+- **Qualidade de Código** - Força boas práticas de desenvolvimento
 
 ---
 

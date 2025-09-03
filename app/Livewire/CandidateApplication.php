@@ -77,48 +77,43 @@ class CandidateApplication extends Component
 
     public function submit()
     {
-        try {
-            $this->validate();
-            
-            $existingByEmail = Candidates::where('email', $this->email)->exists();
-            if ($existingByEmail) {
-                session()->flash('error', 'Este email já foi utilizado para uma candidatura.');
-                return;
-            }
-
-            $clientIp = request()->ip();
-            $existingByIp = Candidates::where('submitter_ip', $clientIp)
-                ->where('created_at', '>=', now()->subDay())
-                ->exists();
-            
-            if ($existingByIp) {
-                session()->flash('error', 'Já foi registrada uma candidatura deste local nas últimas 24 horas.');
-                return;
-            }
-            
-            $resumePath = null;
-            if ($this->resume_path) {
-                $resumePath = $this->resume_path->store('resumes', 'public');
-            }
-            
-            Candidates::create([
-                'name' => $this->name,
-                'email' => $this->email,
-                'phone' => $this->phone,
-                'desired_position' => $this->desired_position,
-                'education_level' => $this->education_level,
-                'observations' => $this->observations,
-                'resume_path' => $resumePath,
-                'submitter_ip' => $clientIp,
-            ]);
-            
-            session()->flash('success', 'Candidatura enviada com sucesso! Entraremos em contato em breve.');
-            
-            $this->reset(['name', 'email', 'phone', 'desired_position', 'education_level', 'observations', 'resume_path']);
-            
-        } catch (\Exception $e) {
-            session()->flash('error', 'Erro: ' . $e->getMessage());
+        $this->validate();
+        
+        $existingByEmail = Candidates::where('email', $this->email)->exists();
+        if ($existingByEmail) {
+            session()->flash('error', 'Este email já foi utilizado para uma candidatura.');
+            return;
         }
+
+        $clientIp = request()->ip();
+        $existingByIp = Candidates::where('submitter_ip', $clientIp)
+            ->where('created_at', '>=', now()->subDay())
+            ->exists();
+        
+        if ($existingByIp) {
+            session()->flash('error', 'Já foi registrada uma candidatura deste local nas últimas 24 horas.');
+            return;
+        }
+        
+        $resumePath = null;
+        if ($this->resume_path) {
+            $resumePath = $this->resume_path->store('resumes', 'public');
+        }
+        
+        Candidates::create([
+            'name' => $this->name,
+            'email' => $this->email,
+            'phone' => $this->phone,
+            'desired_position' => $this->desired_position,
+            'education_level' => $this->education_level,
+            'observations' => $this->observations,
+            'resume_path' => $resumePath,
+            'submitter_ip' => $clientIp,
+        ]);
+        
+        session()->flash('success', 'Candidatura enviada com sucesso! Entraremos em contato em breve.');
+        
+        $this->reset(['name', 'email', 'phone', 'desired_position', 'education_level', 'observations', 'resume_path']);
     }
 
     public function render()

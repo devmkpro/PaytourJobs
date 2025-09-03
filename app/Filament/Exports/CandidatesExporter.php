@@ -26,8 +26,17 @@ class CandidatesExporter extends Exporter
             ExportColumn::make('desired_position')
                 ->label('Cargo Desejado'),
             ExportColumn::make('education_level')
-                ->label('Nível de Educação')
-                ->formatStateUsing(fn($state) => $state instanceof \App\Enums\EducationLevel ? $state->getLabel() : (string) $state),
+                ->label('Nível de Escolaridade')
+                ->formatStateUsing(function($state, $record) {
+                    if ($record && $record->education_level instanceof \App\Enums\EducationLevel) {
+                        return $record->education_level->getLabel();
+                    }
+                    if (is_string($state)) {
+                        $enum = \App\Enums\EducationLevel::tryFrom($state);
+                        return $enum ? $enum->getLabel() : $state;
+                    }
+                    return $state instanceof \App\Enums\EducationLevel ? $state->getLabel() : (string) $state;
+                }),
             ExportColumn::make('observations')
                 ->label('Observações'),
             ExportColumn::make('resume_path')

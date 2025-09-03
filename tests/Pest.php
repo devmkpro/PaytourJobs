@@ -12,8 +12,8 @@
 */
 
 pest()->extend(Tests\TestCase::class)
- // ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
-    ->in('Feature');
+    ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
+    ->in('Feature', 'Unit');
 
 /*
 |--------------------------------------------------------------------------
@@ -30,6 +30,14 @@ expect()->extend('toBeOne', function () {
     return $this->toBe(1);
 });
 
+expect()->extend('toBeCandidate', function () {
+    return $this->toBeInstanceOf(\App\Models\Candidates::class);
+});
+
+expect()->extend('toHaveValidationError', function (string $field) {
+    return $this->toHaveKey($field);
+});
+
 /*
 |--------------------------------------------------------------------------
 | Functions
@@ -41,7 +49,24 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+function createCandidate(array $attributes = []): \App\Models\Candidates
 {
-    // ..
+    return \App\Models\Candidates::factory()->create($attributes);
+}
+
+function createCandidateWithEducationLevel(\App\Enums\EducationLevel $level): \App\Models\Candidates
+{
+    return \App\Models\Candidates::factory()->withEducationLevel($level)->create();
+}
+
+function validCandidateData(array $overrides = []): array
+{
+    return array_merge([
+        'name' => 'João Silva',
+        'email' => 'joao@exemplo.com',
+        'phone' => '(11) 99999-9999',
+        'desired_position' => 'Desenvolvedor PHP',
+        'education_level' => \App\Enums\EducationLevel::SUPERIOR->value,
+        'observations' => 'Experiência em Laravel',
+    ], $overrides);
 }
