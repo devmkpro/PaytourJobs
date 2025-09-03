@@ -77,12 +77,4 @@ return [
         public_path('storage') => storage_path('app/public'),
     ],
 
-
-    'public_hostinger' => [
-        'driver' => 'local',
-        'root' => storage_path('app/public'),
-        'url' => env('APP_URL').'/public/storage',
-        'visibility' => 'public',
-    ],
-
 ];
