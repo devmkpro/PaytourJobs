@@ -66,6 +66,7 @@ class CandidatesResource extends Resource
                                     ->placeholder(__('candidate@example.com'))
                                     ->email()
                                     ->required()
+                                    ->unique(ignoreRecord: true)
                                     ->maxLength(255),
                             ]),
                         Grid::make(1)
