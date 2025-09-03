@@ -4,12 +4,13 @@ namespace App\Livewire;
 
 use App\Enums\EducationLevel;
 use App\Models\Candidates;
+use App\Traits\GetsRealIpAddress;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
 class CandidateApplication extends Component
 {
-    use WithFileUploads;
+    use WithFileUploads, GetsRealIpAddress;
 
     public $name = '';
     public $email = '';
@@ -85,7 +86,7 @@ class CandidateApplication extends Component
             return;
         }
 
-        $clientIp = request()->ip();
+        $clientIp = $this->getRealIpAddr();
         $existingByIp = Candidates::where('submitter_ip', $clientIp)
             ->where('created_at', '>=', now()->subDay())
             ->exists();

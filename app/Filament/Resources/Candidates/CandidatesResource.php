@@ -6,6 +6,7 @@ use App\Enums\EducationLevel;
 use App\Filament\Exports\CandidatesExporter;
 use App\Filament\Resources\Candidates\Pages\ManageCandidates;
 use App\Models\Candidates;
+use App\Traits\GetsRealIpAddress;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -32,6 +33,8 @@ use Filament\Tables\Table;
 
 class CandidatesResource extends Resource
 {
+    use GetsRealIpAddress;
+    
     protected static ?string $model = Candidates::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::UserGroup;
@@ -134,7 +137,7 @@ class CandidatesResource extends Resource
                                     ->placeholder(__('IP address will be automatically filled'))
                                     ->disabled()
                                     ->dehydrated()
-                                    ->default(request()->ip()),
+                                    ->default((new self())->getRealIpAddr()),
                             ]),
                     ])
                     ->collapsible(),

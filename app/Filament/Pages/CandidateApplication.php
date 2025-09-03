@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Enums\EducationLevel;
 use App\Models\Candidates;
+use App\Traits\GetsRealIpAddress;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -22,6 +23,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class CandidateApplication extends SimplePage
 {
+    use GetsRealIpAddress;
+    
     protected static ?string $navigationIcon = 'heroicon-o-user-plus';
 
     protected static ?string $title = 'Candidatar-se';
@@ -142,7 +145,7 @@ class CandidateApplication extends SimplePage
         $data = $this->form->getState();
         
         // Add the submitter IP
-        $data['submitter_ip'] = request()->ip();
+        $data['submitter_ip'] = $this->getRealIpAddr();
         
         try {
             Candidates::create($data);
