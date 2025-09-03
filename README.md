@@ -197,7 +197,7 @@ O sistema suporta português brasileiro:
 
 ### 🌐 Portal de Candidaturas (Acesso Público)
 
-**URL**: `http://localhost:8000/candidatar`
+**URL**: `http://localhost:8000`
 
 #### Preenchimento do Formulário:
 1. **Dados Pessoais**:
@@ -458,16 +458,6 @@ public function mount()
 }
 ```
 
-#### Gates Personalizados
-```php
-// AppServiceProvider.php
-Gate::define('manage-sensitive-data', function ($user) {
-    return $user->hasRole('admin');
-});
-```
-
----
-
 ## 🌐 Rotas e Endpoints
 
 ### 🌍 Rotas Públicas
@@ -475,10 +465,6 @@ Gate::define('manage-sensitive-data', function ($user) {
 // Portal de candidaturas
 Route::get('/', fn() => view('candidate-page'))->name('home');
 Route::get('/candidatar', fn() => view('candidate-page'))->name('candidate-application');
-
-// Assets públicos
-Route::get('/storage/{path}', [StorageController::class, 'serve'])
-    ->where('path', '.*')->name('storage.serve');
 ```
 
 ### 🔒 Rotas Administrativas (Filament)
