@@ -308,92 +308,6 @@ paytour-jobs/
     ├── web.php                             # Rotas públicas
     └── admin.php                           # Rotas administrativas (se houver)
 ```
-
-### 🔧 Componentes Arquiteturais
-
-#### 1. **Livewire Component** - `CandidateApplication`
-```php
-class CandidateApplication extends Component
-{
-    use WithFileUploads;
-    
-    // Propriedades reativas
-    public string $name = '';
-    public string $email = '';
-    public string $phone = '';
-    // ...
-    
-    // Regras de validação
-    protected array $rules = [
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|unique:candidates,email',
-        // ...
-    ];
-    
-    // Método principal de submissão
-    public function submit(): void
-    {
-        $this->validate();
-        // Lógica de negócio...
-    }
-}
-```
-
-#### 2. **Filament Resource** - `CandidatesResource`
-```php
-class CandidatesResource extends Resource
-{
-    protected static ?string $model = Candidates::class;
-    
-    // Definição do formulário
-    public static function form(Schema $schema): Schema
-    {
-        return $schema->components([
-            TextInput::make('name')->required(),
-            TextInput::make('email')->email()->required(),
-            FileUpload::make('resume_path')
-                ->disk('public')
-                ->directory('resumes'),
-            // ...
-        ]);
-    }
-    
-    // Definição da tabela
-    public static function table(Table $table): Table
-    {
-        return $table->columns([
-            TextColumn::make('name')->searchable(),
-            TextColumn::make('email')->searchable(),
-            // ...
-        ]);
-    }
-}
-```
-
-#### 3. **Model** - `Candidates`
-```php
-class Candidates extends Model
-{
-    protected $fillable = [
-        'name', 'email', 'phone', 'desired_position',
-        'education_level', 'observations', 'resume_path', 'submitter_ip'
-    ];
-    
-    protected $casts = [
-        'education_level' => EducationLevel::class,
-        'created_at' => 'datetime',
-    ];
-    
-    // Accessor para URL do currículo
-    public function getResumeUrlAttribute(): ?string
-    {
-        return $this->resume_path 
-            ? Storage::disk('public')->url($this->resume_path)
-            : null;
-    }
-}
-```
-
 ---
 
 ## 🔐 Estrutura de Permissões
@@ -437,26 +351,6 @@ class Candidates extends Model
 'restore_users', 'force_delete_users'
 ```
 
-### 🛡️ Implementação de Segurança
-
-#### Middleware de Autorização
-```php
-// Verificação em controllers
-public function index()
-{
-    $this->authorize('view_any_candidates');
-    return view('candidates.index');
-}
-
-// Verificação em Livewire
-public function mount()
-{
-    if (!auth()->user()->can('create_candidates')) {
-        abort(403);
-    }
-}
-```
-
 ## 🌐 Rotas e Endpoints
 
 ### 🌍 Rotas Públicas
@@ -464,33 +358,6 @@ public function mount()
 // Portal de candidaturas
 Route::get('/', fn() => view('candidate-page'))->name('home');
 Route::get('/candidatar', fn() => view('candidate-page'))->name('candidate-application');
-```
-
-### 🔒 Rotas Administrativas (Filament)
-```php
-// Painel administrativo
-/admin                    // Dashboard principal
-/admin/login             // Autenticação
-/admin/candidates        // Gestão de candidatos
-/admin/candidates/create // Criar candidato
-/admin/candidates/{id}   // Visualizar candidato
-/admin/candidates/{id}/edit // Editar candidato
-/admin/users            // Gestão de usuários (se habilitado)
-```
-
-### 📡 Endpoints API (Livewire)
-```php
-// Comunicação do Livewire
-POST /livewire/message/{component}  // Interações do componente
-POST /livewire/upload-file          // Upload temporário
-DELETE /livewire/upload-file        // Remover upload temporário
-```
-
-### 📁 Rotas de Storage
-```php
-// Arquivos públicos
-GET /storage/resumes/{filename}     // Download de currículos
-GET /storage/livewire-tmp/{file}    // Arquivos temporários
 ```
 
 ---
@@ -531,60 +398,7 @@ php artisan test
 - ✅ **Componentes Livewire** - Funcionalidades interativas
 - ✅ **Regras de Negócio** - Anti-spam e duplicações
 
-### 📋 Suíte de Testes Atual
-
-#### 🔬 Testes Unitários (`tests/Unit/`)
-
-**1. Modelo Candidates** (`CandidatesModelTest.php`)
-```php
-✓ Candidates Model → it can create a candidate with valid data
-✓ Candidates Model → it validates required fields  
-✓ Candidates Model → it casts education_level to enum correctly
-✓ Candidates Model → it returns correct education level label
-✓ Candidates Model → it handles different education levels correctly
-✓ Candidates Model → it stores timestamps correctly
-✓ Candidates Model → it can have nullable observations
-✓ Candidates Model → it can have nullable resume_path
-✓ Candidates Model → it stores submitter_ip correctly
-✓ Candidates Model → it prevents duplicate emails
-✓ Candidates Model → it validates email format in model fillable
-```
-
-**2. Enum EducationLevel** (`EducationLevelEnumTest.php`)
-```php
-✓ EducationLevel Enum → it has all expected cases
-✓ EducationLevel Enum → it has correct values for each case
-✓ EducationLevel Enum → it returns correct labels
-✓ EducationLevel Enum → it can be instantiated from string values
-✓ EducationLevel Enum → it throws exception for invalid values
-✓ EducationLevel Enum → it can use tryFrom safely
-✓ EducationLevel Enum → it can be serialized to json
-✓ EducationLevel Enum → it maintains consistency between value and string representation
-```
-
-**3. Validações de Candidatos** (`CandidateValidationTest.php`)
-```php
-✓ Candidate Validations → it validates name is required
-✓ Candidate Validations → it validates name maximum length
-✓ Candidate Validations → it validates email format
-✓ Candidate Validations → it accepts valid email formats
-✓ Candidate Validations → it validates phone minimum length
-✓ Candidate Validations → it validates phone maximum length
-✓ Candidate Validations → it accepts valid phone formats
-✓ Candidate Validations → it validates desired position is required
-✓ Candidate Validations → it validates education level is required
-✓ Candidate Validations → it accepts valid education level values
-✓ Candidate Validations → it validates observations maximum length
-✓ Candidate Validations → it allows null observations
-✓ Candidate Validations → it validates file mime types
-```
-
-#### � Testes de Feature (`tests/Feature/`)
-
-**Teste de Aplicação** (`ExampleTest.php`)
-```php
-✓ the application returns a successful response
-```
+---
 
 ### 🛠️ Tecnologias de Teste
 
@@ -594,96 +408,9 @@ php artisan test
 - **Factories** - Geração de dados de teste consistentes
 - **Custom Expectations** - Validações específicas do domínio
 
-### 📈 Benefícios da Suíte de Testes
-
-- **Confiabilidade** - Detecta regressões automaticamente
-- **Documentação Viva** - Testes servem como especificação
-- **Refatoração Segura** - Permite mudanças com confiança
-- **CI/CD Ready** - Integração contínua preparada
-- **Qualidade de Código** - Força boas práticas de desenvolvimento
 
 ---
 
-## 🤝 Avaliação Técnica
-
-### ✅ Competências Demonstradas
-
-#### 🎯 **Laravel Avançado**
-- ✅ Uso correto de **Eloquent ORM** com relationships
-- ✅ **Migrations** e **Seeders** bem estruturados
-- ✅ **Service Providers** e **Dependency Injection**
-- ✅ **Policies** e **Gates** para autorização
-- ✅ **Validation** customizada e **Form Requests**
-- ✅ **Storage** e **Filesystem** para upload de arquivos
-- ✅ **Queues** e **Jobs** (preparado para implementação)
-
-#### 🎨 **Frontend Moderno**
-- ✅ **Livewire 3** para componentes reativos
-- ✅ **Alpine.js** para interatividade
-- ✅ **Tailwind CSS** para design responsivo
-- ✅ **Vite** para build otimizado
-- ✅ **Blade Components** reutilizáveis
-
-#### 🛡️ **Segurança e Boas Práticas**
-- ✅ **Spatie Permission** para controle granular
-- ✅ **CSRF Protection** em todos os formulários
-- ✅ **Input Validation** e **Sanitization**
-- ✅ **Rate Limiting** para prevenção de spam
-- ✅ **File Upload Security** com validação rigorosa
-- ✅ **SQL Injection** prevention com Eloquent
-
-#### 📊 **Filament v4 Expertise**
-- ✅ **Resources** customizados e bem estruturados
-- ✅ **Forms** dinâmicos com validação
-- ✅ **Tables** com filtros e ações
-- ✅ **Custom Pages** quando necessário
-- ✅ **File Upload** integration
-- ✅ **Custom Actions** e **Bulk Actions**
-
-#### 🏗️ **Arquitetura e Design Patterns**
-- ✅ **Repository Pattern** (implementado via Eloquent)
-- ✅ **Service Layer** para lógica complexa
-- ✅ **Observer Pattern** (eventos do Eloquent)
-- ✅ **Factory Pattern** (Eloquent Factories)
-- ✅ **Strategy Pattern** (Policies e Gates)
-- ✅ **Dependency Injection** e **IoC Container**
-
-### 🔍 **Pontos de Destaque Técnico**
-
-1. **Componentização Inteligente**:
-   - Separação clara entre componente público (Livewire) e admin (Filament)
-   - Reutilização de código sem duplicação
-
-2. **Validação Multicamada**:
-   - Frontend (Alpine.js + Livewire)
-   - Backend (Form Requests + Model)
-   - Banco de dados (Constraints)
-
-3. **Sistema de Permissões Escalável**:
-   - Preparado para crescimento da equipe
-   - Granularidade adequada para diferentes níveis de acesso
-
-4. **Performance Otimizada**:
-   - Lazy loading de relacionamentos
-   - Cache de configurações
-   - Otimização de queries
-
-5. **Manutenibilidade**:
-   - Código limpo e documentado
-   - Estrutura consistente
-   - Fácil extensibilidade
-
-### 📈 **Escalabilidade Preparada**
-
-- **Microservices Ready**: Estrutura permite extração de serviços
-- **API First**: Facilmente adaptável para SPAs
-- **Cloud Native**: Configurado para deploy em nuvem
-- **Monitoring Ready**: Preparado para Telescope/Horizon
-- **Testing Coverage**: Base sólida para TDD/BDD
-
----
-
-## 📞 Contato e Documentação
 
 ### 📧 Informações de Desenvolvimento
 - **Arquitetura**: Laravel 12 + Filament v4 + Livewire 3
@@ -718,5 +445,3 @@ Este projeto representa uma implementação completa e profissional de um sistem
 **Desenvolvido com excelência técnica para demonstrar competências profissionais em desenvolvimento web moderno.**
 
 ---
-
-*💡 Para dúvidas técnicas ou esclarecimentos sobre implementação, consulte a documentação inline do código ou entre em contato através dos canais apropriados.*
