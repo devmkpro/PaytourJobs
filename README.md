@@ -93,7 +93,7 @@ O **PayTour Jobs** é uma aplicação web moderna que demonstra competências av
 ## ⚙️ Requisitos
 
 ### Ambiente de Desenvolvimento
-- **PHP** 8.2 ou superior
+- **PHP** 8.3 ou superior
 - **Composer** 2.0+
 - **Node.js** 18+ e NPM
 - **MySQL** 8.0+ ou **PostgreSQL** 13+
