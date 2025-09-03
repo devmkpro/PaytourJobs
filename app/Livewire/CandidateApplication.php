@@ -1,0 +1,128 @@
+<?php
+
+namespace App\Livewire;
+
+use App\Enums\EducationLevel;
+use App\Models\Candidates;
+use Livewire\Component;
+use Livewire\WithFileUploads;
+
+class CandidateApplication extends Component
+{
+    use WithFileUploads;
+
+    public $name = '';
+    public $email = '';
+    public $phone = '';
+    public $desired_position = '';
+    public $education_level = '';
+    public $observations = '';
+    public $resume_path;
+
+    protected $rules = [
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|max:255',
+        'phone' => 'required|string|min:8|max:20',
+        'desired_position' => 'required|string|max:255',
+        'education_level' => 'required|string',
+        'observations' => 'nullable|string|max:1000',
+        'resume_path' => 'nullable|file|mimes:pdf,doc,docx|max:5120', // 5MB max
+    ];
+
+    protected $messages = [
+        'name.required' => 'O nome é obrigatório.',
+        'email.required' => 'O email é obrigatório.',
+        'email.email' => 'Digite um email válido.',
+        'email.unique' => 'Este email já foi cadastrado.',
+        'phone.required' => 'O telefone é obrigatório.',
+        'phone.min' => 'Digite um telefone válido com DDD.',
+        'desired_position.required' => 'O cargo desejado é obrigatório.',
+        'education_level.required' => 'O nível de escolaridade é obrigatório.',
+        'resume_path.mimes' => 'O currículo deve ser um arquivo PDF, DOC ou DOCX.',
+        'resume_path.max' => 'O arquivo deve ter no máximo 5MB.',
+    ];
+
+    public function updatedPhone($value)
+    {
+        $cleanPhone = preg_replace('/\D/', '', $value);
+        if (strlen($cleanPhone) >= 11) {
+            $cleanPhone = substr($cleanPhone, 0, 11);
+            $this->phone = preg_replace('/(\d{2})(\d{5})(\d{4})/', '($1) $2-$3', $cleanPhone);
+        } elseif (strlen($cleanPhone) >= 10) {
+            $cleanPhone = substr($cleanPhone, 0, 10);
+            $this->phone = preg_replace('/(\d{2})(\d{4})(\d{4})/', '($1) $2-$3', $cleanPhone);
+        } else {
+            $this->phone = $value;
+        }
+        
+        if (strlen($cleanPhone) >= 10) {
+            $this->validateOnly('phone');
+        }
+    }
+
+    public function updatedEmail()
+    {
+        $this->validateOnly('email');
+    }
+
+    public function getEducationLevelsProperty()
+    {
+        return [
+            EducationLevel::FUNDAMENTAL->value => 'Ensino Fundamental',
+            EducationLevel::MEDIO->value => 'Ensino Médio',
+            EducationLevel::SUPERIOR->value => 'Ensino Superior',
+            EducationLevel::POS_GRADUACAO->value => 'Pós-graduação',
+        ];
+    }
+
+    public function submit()
+    {
+        try {
+            $this->validate();
+            
+            $existingByEmail = Candidates::where('email', $this->email)->exists();
+            if ($existingByEmail) {
+                session()->flash('error', 'Este email já foi utilizado para uma candidatura.');
+                return;
+            }
+
+            $clientIp = request()->ip();
+            $existingByIp = Candidates::where('submitter_ip', $clientIp)
+                ->where('created_at', '>=', now()->subDay())
+                ->exists();
+            
+            if ($existingByIp) {
+                session()->flash('error', 'Já foi registrada uma candidatura deste local nas últimas 24 horas.');
+                return;
+            }
+            
+            $resumePath = null;
+            if ($this->resume_path) {
+                $resumePath = $this->resume_path->store('resumes', 'public');
+            }
+            
+            Candidates::create([
+                'name' => $this->name,
+                'email' => $this->email,
+                'phone' => $this->phone,
+                'desired_position' => $this->desired_position,
+                'education_level' => $this->education_level,
+                'observations' => $this->observations,
+                'resume_path' => $resumePath,
+                'submitter_ip' => $clientIp,
+            ]);
+            
+            session()->flash('success', 'Candidatura enviada com sucesso! Entraremos em contato em breve.');
+            
+            $this->reset(['name', 'email', 'phone', 'desired_position', 'education_level', 'observations', 'resume_path']);
+            
+        } catch (\Exception $e) {
+            session()->flash('error', 'Erro: ' . $e->getMessage());
+        }
+    }
+
+    public function render()
+    {
+        return view('livewire.candidate-application');
+    }
+}
