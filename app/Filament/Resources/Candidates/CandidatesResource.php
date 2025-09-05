@@ -176,6 +176,12 @@ class CandidatesResource extends Resource
                     ->formatStateUsing(fn($state) => $state ? __('Uploaded') : __('Not uploaded'))
                     ->badge()
                     ->color(fn($state) => $state ? 'success' : 'danger'),
+                TextColumn::make('submitter_ip')
+                    ->label(__('Submitter IP'))
+                    ->limit(15)
+                    ->copyable()
+                    
+                    ->searchable(),
                 TextColumn::make('created_at')
                     ->label(__('Created at'))
                     ->dateTime('d/m/Y H:i')
