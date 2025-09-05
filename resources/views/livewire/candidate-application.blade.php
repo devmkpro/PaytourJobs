@@ -73,32 +73,8 @@
                            wire:model.blur="phone" 
                            class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white transition-colors @error('phone') border-red-500 @else border-gray-300 dark:border-gray-600 @enderror"
                            placeholder="(11) 99999-9999"
-                           maxlength="15"
+                           maxlength="13"
                            inputmode="numeric"
-                           x-data="{ 
-                               formatPhone(event) {
-                                   let value = event.target.value.replace(/\D/g, '');
-                                   if (value.length <= 11) {
-                                       if (value.length >= 11) {
-                                           value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
-                                       } else if (value.length >= 10) {
-                                           value = value.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
-                                       } else if (value.length >= 7) {
-                                           value = value.replace(/(\d{2})(\d{4,5})/, '($1) $2');
-                                           if (value.length > 9) {
-                                               value = value.replace(/(\(\d{2}\)\s\d{4,5})(\d+)/, '$1-$2');
-                                           }
-                                       } else if (value.length >= 3) {
-                                           value = value.replace(/(\d{2})(\d*)/, '($1) $2');
-                                       } else if (value.length >= 1) {
-                                           value = value.replace(/(\d{1,2})/, '($1');
-                                       }
-                                       event.target.value = value;
-                                   } else {
-                                       event.target.value = event.target.value.slice(0, -1);
-                                   }
-                               }
-                           }"
                            x-on:input="formatPhone($event)"
                            onkeypress="return event.charCode >= 48 && event.charCode <= 57 || event.charCode === 8 || event.charCode === 46"
                            required>
