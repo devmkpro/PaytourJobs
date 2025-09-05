@@ -180,7 +180,7 @@ class CandidatesResource extends Resource
                     ->label(__('Submitter IP'))
                     ->limit(15)
                     ->copyable()
-                    
+                    ->toggleable()
                     ->searchable(),
                 TextColumn::make('created_at')
                     ->label(__('Created at'))
