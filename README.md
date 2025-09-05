@@ -378,9 +378,6 @@ O sistema possui uma **suíte de testes abrangente** desenvolvida com **PHP Pest
 # Executar apenas testes de feature
 ./vendor/bin/pest tests/Feature/
 
-# Executar testes com detalhes verbose
-./vendor/bin/pest --verbose
-
 # Executar testes com parada no primeiro erro
 ./vendor/bin/pest --stop-on-failure
 
