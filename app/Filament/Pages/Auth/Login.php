@@ -17,7 +17,7 @@ class Login extends BaseLogin
 
     public function getSubheading(): string | Htmlable | null
     {
-        return 'Entre com suas credenciais para acessar o painel administrativo';
+        return 'Entre com suas credenciais para acessar o painel administrativo.';
     }
 
     public function form(Schema $schema): Schema
@@ -38,6 +38,7 @@ class Login extends BaseLogin
             ->required()
             ->autocomplete()
             ->autofocus()
+            ->placeholder('admin@admin.com')
             ->default('admin@admin.com')
             ->extraInputAttributes(['tabindex' => 1]);
     }
@@ -50,6 +51,7 @@ class Login extends BaseLogin
             ->revealable(true)
             ->autocomplete('current-password')
             ->required()
+            ->placeholder('password')
             ->default('password')
             ->extraInputAttributes(['tabindex' => 2]);
     }
