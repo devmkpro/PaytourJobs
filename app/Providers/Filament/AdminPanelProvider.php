@@ -28,7 +28,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->login(Login::class) 
+            ->login(Login::class)
             ->spa()
             ->databaseNotifications()
             ->databaseNotificationsPolling('10s')
@@ -53,6 +53,7 @@ class AdminPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
             ])
+            ->sidebarCollapsibleOnDesktop(true)
             ->authMiddleware([
                 Authenticate::class,
             ]);

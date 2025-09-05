@@ -23,7 +23,7 @@ class CandidateApplication extends Component
     protected $rules = [
         'name' => 'required|string|max:255',
         'email' => 'required|email|max:255',
-        'phone' => 'required|string|min:8|max:20',
+        'phone' => 'required|string|min:10|max:15',
         'desired_position' => 'required|string|max:255',
         'education_level' => 'required|string',
         'observations' => 'nullable|string|max:1000',
@@ -37,6 +37,7 @@ class CandidateApplication extends Component
         'email.unique' => 'Este email já foi cadastrado.',
         'phone.required' => 'O telefone é obrigatório.',
         'phone.min' => 'Digite um telefone válido com DDD.',
+        'phone.max' => 'Telefone muito longo.',
         'desired_position.required' => 'O cargo desejado é obrigatório.',
         'education_level.required' => 'O nível de escolaridade é obrigatório.',
         'resume_path.mimes' => 'O currículo deve ser um arquivo PDF, DOC ou DOCX.',
@@ -46,16 +47,6 @@ class CandidateApplication extends Component
     public function updatedPhone($value)
     {
         $cleanPhone = preg_replace('/\D/', '', $value);
-        if (strlen($cleanPhone) >= 11) {
-            $cleanPhone = substr($cleanPhone, 0, 11);
-            $this->phone = preg_replace('/(\d{2})(\d{5})(\d{4})/', '($1) $2-$3', $cleanPhone);
-        } elseif (strlen($cleanPhone) >= 10) {
-            $cleanPhone = substr($cleanPhone, 0, 10);
-            $this->phone = preg_replace('/(\d{2})(\d{4})(\d{4})/', '($1) $2-$3', $cleanPhone);
-        } else {
-            $this->phone = $value;
-        }
-        
         if (strlen($cleanPhone) >= 10) {
             $this->validateOnly('phone');
         }
@@ -78,6 +69,12 @@ class CandidateApplication extends Component
 
     public function submit()
     {
+        $cleanPhone = preg_replace('/\D/', '', $this->phone);
+        if (strlen($cleanPhone) < 10 || strlen($cleanPhone) > 11) {
+            $this->addError('phone', 'Digite um telefone válido com DDD.');
+            return;
+        }
+        
         $this->validate();
         
         $existingByEmail = Candidates::where('email', $this->email)->exists();
